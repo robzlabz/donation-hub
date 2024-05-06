@@ -1,15 +1,15 @@
 # DonationHub
 
-DonationHub is a web application designed to facilitate connections between donors and recipients, allowing donors to contribute to projects and recipients to create projects to receive donations. It's primarily built as a learning project for mastering backend development with the Go programming language. While the emphasis is on backend development, the frontend interface is provided as a reference, requiring no modifications.
+DonationHub is a web application designed to facilitate connections between donors and requesters, allowing donors to contribute to projects and requesters to create projects to receive donations. It's primarily built as a learning project for mastering backend development with the Go programming language. While the emphasis is on backend development, the frontend interface is provided as a reference, requiring minimum modifications.
 
 ## Your Missions
 
 1. Implement all features defined in the provided API documentation and the web prototype with [Hexagonal Architecture](https://github.com/Haraj-backend/hex-monscape/blob/master/docs/reference/hex-architecture.md), including:
-    - User registration for donors and recipients.
+    - User registration for donors and requesters.
     - User login functionality.
-    - Home page interface for guests, donors, and recipients, displaying relevant information such as total donations distributed and a list of donation projects.
+    - Home page interface for guests, donors, and requesters, displaying relevant information such as total donations distributed and a list of donation projects.
     - Donation project detail page, featuring donation details, a donate button, and a list of donors along with their messages.
-    - Admin interface with access to lists of donation projects, donors, and recipients for administrative purposes.
+    - Admin interface with access to lists of donation projects, donors, and requesters for administrative purposes.
 2. Implement qualified unit tests to ensure the reliability and correctness of your code.
 3. Implement local deployment for easy testing and development.
 4. Ensure maintainability of the codebase:
@@ -22,9 +22,9 @@ DonationHub is a web application designed to facilitate connections between dono
 When starting DonationHub, please refer to the following files for essential information:
 
 - `cmd/main.go`: Entry point of the application.
-- `cmd/web/index.html`: Prototype frontend interface for this project.
-- `docs/http_api.md`: Documentation outlining the API endpoints and usage.
-- `docs/schema.sql`: Definition of the database schema for DonationHub.
+- `cmd/web/*.html`: Prototype frontend interface for this project.
+- `docs/rest_api.md`: Documentation outlining the API endpoints and usage.
+- `docs/db/*.sql`: Definition of the database schema for DonationHub.
 
 ## Evaluation
 
