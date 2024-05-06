@@ -20,14 +20,14 @@ Beside these endpoints, client need to handle properly [Common Errors](./common_
 
 ## Register 
 
-POST: `/user/register`
+POST: `/users/register`
 
 This endpoint is used to register a new user to the system. It's provided for both donor and requester.
 
 **Example Request:**
 
 ```json
-POST /register
+POST /users/register
 Content-Type: application/json
 
 {
@@ -68,7 +68,7 @@ No specific error response.
 
 ## Login
 
-POST: `/user/login`
+POST: `/users/login`
 
 This endpoint is used to login to the system. It returns a JWT token that can be used to access other endpoints named `access_token`.
 
@@ -87,7 +87,7 @@ The JWT secret will be `donation-hub`, and the access token will be valid for 1 
 **Example Request:**
 
 ```json
-POST /session
+POST /users/login
 Content-Type: application/json
 
 {

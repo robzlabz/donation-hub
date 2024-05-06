@@ -1,6 +1,6 @@
 # DonationHub
 
-DonationHub is a web application designed to facilitate connections between donors and requesters, allowing requesters to create projects to raise funds and receive donations and donors to contribute to projects . It's primarily built as a fun project for learning backend development with the Go programming language. While the emphasis is on backend development, the frontend interface is provided as a reference, requiring minimum modifications.
+DonationHub is a web application designed to facilitate connections between donors and requesters, allowing requesters to create projects to raise funds and receive donations and donors to donate to projects. It's primarily built as a fun project for learning backend development with the Go programming language. While the emphasis is on backend development, the frontend interface is provided as a reference, requiring minimum modifications.
 
 ## Your Missions
 
