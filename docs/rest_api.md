@@ -485,7 +485,12 @@ This endpoint is used to list all projects available in the system.
 
 - `status` => Filter projects based on status. The value is `approved`, `rejected`, `need_review`, `completed`. If not provided, it will return projects with all status.
   - For `need_review` status, only admin can see the projects.
-  - For `completed` status, only admin and donor who donated to the project can see the projects.
+  
+  > Note:
+  > - `need_review`: initial status of the project after submission.
+  > - `approved`: status of the project after admin review and approved.
+  > - `rejected`: status of the project after admin review and rejected.
+  > - `completed`: status of the project once the target amount is reached or the due time is reached.
 - `start_ts` => Filter projects based on start timestamp. The value is integer.
 - `end_ts` => Filter projects based on end timestamp. The value is integer.
 - `limit` => Limit the number of projects returned. The value is integer. Default is 10.
@@ -520,7 +525,12 @@ GET /projects?status=approved&limit=10&start_ts=1704945600&end_ts=1704955600&las
                 "due_at": 1704945600,
                 "target_amount": 1000000,
                 "currency": "USD",
-                "status": "approved"
+                "status": "approved",
+                "requester": {
+                    "id": 1,
+                    "username": "johndoe",
+                    "email": "johndoe@gmail.com"
+                }
             },
             {
                 "id": 2,
@@ -533,7 +543,12 @@ GET /projects?status=approved&limit=10&start_ts=1704945600&end_ts=1704955600&las
                 "due_at": 1704945600,
                 "target_amount": 1000000,
                 "currency": "USD",
-                "status": "approved"
+                "status": "approved",
+                "requester": {
+                    "id": 2,
+                    "username": "janedoe",
+                    "email": "janedoe@gmail.com"
+                }
             }
         ],
         "last_key": "MTcxNDk2Mzg4MT38dsjndjnsdjs3"
@@ -582,7 +597,12 @@ GET /projects/1
         "target_amount": 1000000,
         "collection_amount": 500000,
         "currency": "USD",
-        "status": "approved"
+        "status": "approved",
+        "requester": {
+            "id": 1,
+            "username": "johndoe",
+            "email": "johndoe@gmail.com"
+        }
     },
     "ts": 1704954526
   }
