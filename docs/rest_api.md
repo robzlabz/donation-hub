@@ -78,7 +78,7 @@ The decoded access token will contains at least the following information:
 {
   "id": 1,
   "username": "alfonso",
-  "email": "alfonso@sport_mm.com"
+  "email": "alfonso@gmail.com"
 }
 ```
 
@@ -106,7 +106,7 @@ Content-Type: application/json
   "data": {
     "id": 1,
     "username": "alfonso",
-    "email": "alfonso@sport_mm.com",
+    "email": "alfonso@gmail.com",
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhbGZvbnNvIiwiaWF0IjoxNzM2NTY4MDAwfQ.rWcjBC_4Xg7-P37cdQ6JemVWSFgTQVKl4L_Yt7NMJu4",
   },
   "ts": 1704954526
