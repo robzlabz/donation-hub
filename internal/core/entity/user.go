@@ -2,6 +2,7 @@ package entity
 
 import (
 	"strings"
+	"time"
 
 	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 )
@@ -11,7 +12,7 @@ type User struct {
 	Username  string
 	Email     string
 	Password  string
-	CreatedAt int64
+	CreatedAt time.Time
 }
 
 func (u User) Validate() (err error) {

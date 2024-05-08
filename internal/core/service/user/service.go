@@ -2,14 +2,16 @@ package user
 
 import (
 	"context"
+	"time"
 
+	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 )
 
 type Service interface {
-	RegisterUser(ctx context.Context, rest rest.RegisterRequestBody) (err error)
-	LoginUser(ctx context.Context, rest rest.LoginRequestBody) (err error)
-	GetListUser(ctx context.Context, limit int, page int, role string) (err error)
+	RegisterUser(ctx context.Context, req rest.RegisterRequestBody) (err error)
+	LoginUser(ctx context.Context, req rest.LoginRequestBody) (user entity.User, err error)
+	GetListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error)
 }
 
 type service struct {
@@ -22,21 +24,46 @@ func NewService(storage UserStorage) Service {
 	}
 }
 
-func (s *service) RegisterUser(ctx context.Context, rest rest.RegisterRequestBody) (err error) {
-	// check if username is valid
-	// check if password is valid
-	// check if email is valid
-	// check if user email has aready exists
+func (s *service) RegisterUser(ctx context.Context, req rest.RegisterRequestBody) (err error) {
+	user := entity.User{
+		Username: req.Username,
+		Password: req.Password,
+		Email:    req.Email,
+	}
+
+	// check if username, email and password are valid
+	err = user.Validate()
+	if err != nil {
+		return
+	}
+
+	// check if user has already used
+	err = s.storage.IsExist(ctx, user.Email)
+	if err != nil {
+		return
+	}
+
+	user.CreatedAt = time.Now()
+
+	err = s.storage.RegisterNewUser(ctx, &user)
 
 	return
 }
 
-func (s *service) LoginUser(ctx context.Context, rest rest.LoginRequestBody) (err error) {
-	// todo : implement repository for login user
-	return
+func (s *service) LoginUser(ctx context.Context, req rest.LoginRequestBody) (user entity.User, err error) {
+	err = s.storage.IsExist(ctx, req.Email)
+	if err != nil {
+		return
+	}
+
+	user, err = s.storage.LoginUser(ctx, req)
+	if err != nil {
+		return
+	}
+
+	return user, nil
 }
 
-func (s *service) GetListUser(ctx context.Context, limit int, page int, role string) (err error) {
-	// todo : implement repository for get list user
-	return
+func (s *service) GetListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error) {
+	return s.storage.ListUser(ctx, limit, page, role)
 }
