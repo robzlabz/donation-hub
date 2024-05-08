@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:8180
+
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "username": "alfonso",
+  "email": "alfonso@gmail.com",
+  "password": "123456",
+  "role": "donor"
+}
+
+###
