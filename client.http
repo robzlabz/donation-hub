@@ -11,3 +11,76 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{ baseUrl }}/users/login
+Content-Type: application/json
+
+```json
+{
+  "username" : "alfonso",
+  "password" : "123456"
+}
+```
+
+GET {{ baseUrl }}/users?limit=10&page=1&role=donor
+
+###
+
+GET {{ baseUrl }}/projects/upload?mime_type=image/jpeg&file_size=1048576
+Authorization : 123456
+Content-Type: application/json
+
+
+###
+
+POST {{ baseUrl }}/projects
+Authorization: 123456
+
+###
+
+PUT {{ baseUrl }}/projects/1/review
+Content-Type: application/json
+
+```json
+{
+  "status": "approved"
+}
+```
+
+###
+
+PUT {{ baseUrl }}/projects/1/review
+Content-Type: application/json
+
+```json
+{
+  "status": "rejected"
+}
+```
+
+###
+
+GET {{ baseUrl }}/projects
+Content-Type: application/json
+
+###
+
+GET {{ baseUrl }}/projects/1
+Content-Type: application/json
+
+###
+
+POST {{ baseUrl }}/projects/1/donations
+Content-Type: application/json
+
+```json
+{
+  "amount": 100000,
+  "currency": "USD",
+  "message": "Wish you all the best"
+}
+```
+
+###
+
+GET {{ baseUrl }}/projects/1/donations
