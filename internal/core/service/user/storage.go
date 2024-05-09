@@ -11,5 +11,5 @@ type UserStorage interface {
 	RegisterNewUser(ctx context.Context, user *entity.User) (err error)
 	LoginUser(ctx context.Context, req rest.LoginRequestBody) (user entity.User, err error)
 	ListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error)
-	IsExist(ctx context.Context, email string) (err error)
+	IsExist(ctx context.Context, email string) (exist bool, err error)
 }

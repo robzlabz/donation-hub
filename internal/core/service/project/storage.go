@@ -16,3 +16,7 @@ type ProjectStorage interface {
 	DonateProject(ctx context.Context, model entity.Project, req rest.DonationRequestBody) (err error)
 	ListDonation(ctx context.Context, model entity.Project, limit int, page int) (donations []entity.Donation, err error)
 }
+
+type ObjectStorage interface {
+	GetUploadedUrl() (url string, err error)
+}

@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
@@ -38,8 +39,12 @@ func (s *service) RegisterUser(ctx context.Context, req rest.RegisterRequestBody
 	}
 
 	// check if user has already used
-	err = s.storage.IsExist(ctx, user.Email)
+	exist, err := s.storage.IsExist(ctx, user.Email)
 	if err != nil {
+		return
+	}
+	if exist {
+		err = errors.New("user already exist")
 		return
 	}
 
@@ -51,8 +56,12 @@ func (s *service) RegisterUser(ctx context.Context, req rest.RegisterRequestBody
 }
 
 func (s *service) LoginUser(ctx context.Context, req rest.LoginRequestBody) (user entity.User, err error) {
-	err = s.storage.IsExist(ctx, req.Email)
+	exist, err := s.storage.IsExist(ctx, req.Email)
 	if err != nil {
+		return
+	}
+	if !exist {
+		err = rest.ErrInvalidUsernameOrPassword
 		return
 	}
 

@@ -15,6 +15,15 @@ var (
 )
 
 var (
+	ErrBucketNameIsRequired = errors.New("BucketName is required")
+	ErrObjectKeyIsRequired  = errors.New("ObjectKey is required")
+)
+
+var (
+	ErrSqlClientIsRequired = errors.New("SQLClient is required")
+)
+
+var (
 	ERR_INVALID_CREDS     = "ERR_UNSUPPORTED_TYPE"
 	ERR_FILE_TOO_LARGE    = "ERR_FILE_TOO_LARGE"
 	ERR_UNSUPPORTED_TYPE  = "ERR_UNSUPPORTED_TYPE"
