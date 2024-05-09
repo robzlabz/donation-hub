@@ -35,7 +35,7 @@ func (s *Storage) RequestUploadURL(ctx context.Context) (err error) {
 	return nil
 }
 
-func (s *Storage) SubmitProject(ctx context.Context, req rest.ProjectRequestBody) (err error) {
+func (s *Storage) SubmitProject(ctx context.Context, project entity.Project) (err error) {
 	// implement your logic here
 	return nil
 }
