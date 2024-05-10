@@ -1,9 +1,9 @@
 package entity
 
 import (
+	"github.com/isdzulqor/donation-hub/common/errors"
 	"testing"
 
-	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +15,7 @@ func TestValidateUser(t *testing.T) {
 		}
 		err := u.ValidateUsername()
 		require.NotNil(t, err)
-		assert.Equal(t, rest.ErrUsernameIsRequired, err)
+		assert.Equal(t, errors.ErrUsernameIsRequired, err)
 	})
 
 	t.Run("Successfully validate user", func(t *testing.T) {
@@ -31,7 +31,7 @@ func TestValidateUser(t *testing.T) {
 		u := User{Password: ""}
 		err := u.ValidatePassword()
 		require.NotNil(t, err)
-		assert.Equal(t, rest.ErrPasswordIsRequired, err)
+		assert.Equal(t, errors.ErrPasswordIsRequired, err)
 	})
 
 	t.Run("valid password", func(t *testing.T) {
@@ -45,7 +45,7 @@ func TestValidateUser(t *testing.T) {
 		u := User{Email: ""}
 		err := u.ValidateEmail()
 		require.NotNil(t, err)
-		assert.Equal(t, rest.ErrEmailIsRequired, err)
+		assert.Equal(t, errors.ErrEmailIsRequired, err)
 	})
 
 	t.Run("validate using valid email", func(t *testing.T) {
@@ -59,7 +59,7 @@ func TestValidateUser(t *testing.T) {
 		u := User{Email: "test"}
 		err := u.ValidateEmail()
 		require.NotNil(t, err)
-		assert.Equal(t, rest.ErrInvalidEmail, err)
+		assert.Equal(t, errors.ErrInvalidEmail, err)
 	})
 
 	t.Run("validate with all success", func(t *testing.T) {
@@ -82,19 +82,19 @@ func TestValidateUser(t *testing.T) {
 				user: User{
 					Username: "username", Password: "password", Email: "",
 				},
-				err: rest.ErrEmailIsRequired,
+				err: errors.ErrEmailIsRequired,
 			},
 			{
 				user: User{
 					Username: "username", Password: "", Email: "email",
 				},
-				err: rest.ErrPasswordIsRequired,
+				err: errors.ErrPasswordIsRequired,
 			},
 			{
 				user: User{
 					Username: "", Password: "password", Email: "email",
 				},
-				err: rest.ErrUsernameIsRequired,
+				err: errors.ErrUsernameIsRequired,
 			},
 		}
 

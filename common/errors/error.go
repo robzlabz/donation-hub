@@ -1,4 +1,4 @@
-package rest
+package errors
 
 import "errors"
 

@@ -1,12 +1,12 @@
 package projectupload
 
 import (
+	"github.com/isdzulqor/donation-hub/common/errors"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 )
 
 type Storage struct {
@@ -20,10 +20,10 @@ type Config struct {
 
 func (c Config) Validate() (err error) {
 	if c.BucketName == "" {
-		return rest.ErrBucketNameIsRequired
+		return errors.ErrBucketNameIsRequired
 	}
 	if c.ObjectKey == "" {
-		return rest.ErrObjectKeyIsRequired
+		return errors.ErrObjectKeyIsRequired
 	}
 	return nil
 }

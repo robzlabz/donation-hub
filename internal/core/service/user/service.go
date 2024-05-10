@@ -3,15 +3,16 @@ package user
 import (
 	"context"
 	"errors"
+	errors2 "github.com/isdzulqor/donation-hub/common/errors"
+	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"time"
 
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
-	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 )
 
 type Service interface {
-	RegisterUser(ctx context.Context, req rest.RegisterRequestBody) (err error)
-	LoginUser(ctx context.Context, req rest.LoginRequestBody) (user entity.User, err error)
+	RegisterUser(ctx context.Context, req request.RegisterRequestBody) (err error)
+	LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, err error)
 	GetListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error)
 }
 
@@ -25,7 +26,7 @@ func NewService(storage UserStorage) Service {
 	}
 }
 
-func (s *service) RegisterUser(ctx context.Context, req rest.RegisterRequestBody) (err error) {
+func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestBody) (err error) {
 	user := entity.User{
 		Username: req.Username,
 		Password: req.Password,
@@ -48,20 +49,20 @@ func (s *service) RegisterUser(ctx context.Context, req rest.RegisterRequestBody
 		return
 	}
 
-	user.CreatedAt = time.Now()
+	user.CreatedAt = time.Now().Unix()
 
 	err = s.storage.RegisterNewUser(ctx, &user)
 
 	return
 }
 
-func (s *service) LoginUser(ctx context.Context, req rest.LoginRequestBody) (user entity.User, err error) {
+func (s *service) LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, err error) {
 	exist, err := s.storage.IsExist(ctx, req.Email)
 	if err != nil {
 		return
 	}
 	if !exist {
-		err = rest.ErrInvalidUsernameOrPassword
+		err = errors2.ErrInvalidUsernameOrPassword
 		return
 	}
 

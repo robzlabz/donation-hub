@@ -1,5 +1,9 @@
 @baseUrl = http://localhost:8180
 
+GET {{baseUrl}}/ping
+
+###
+
 POST {{baseUrl}}/users/register
 Content-Type: application/json
 
@@ -15,12 +19,12 @@ Content-Type: application/json
 POST {{ baseUrl }}/users/login
 Content-Type: application/json
 
-```json
 {
   "username" : "alfonso",
   "password" : "123456"
 }
-```
+
+###
 
 GET {{ baseUrl }}/users?limit=10&page=1&role=donor
 
@@ -41,22 +45,18 @@ Authorization: 123456
 PUT {{ baseUrl }}/projects/1/review
 Content-Type: application/json
 
-```json
 {
   "status": "approved"
 }
-```
 
 ###
 
 PUT {{ baseUrl }}/projects/1/review
 Content-Type: application/json
 
-```json
 {
   "status": "rejected"
 }
-```
 
 ###
 
@@ -73,13 +73,11 @@ Content-Type: application/json
 POST {{ baseUrl }}/projects/1/donations
 Content-Type: application/json
 
-```json
 {
   "amount": 100000,
   "currency": "USD",
   "message": "Wish you all the best"
 }
-```
 
 ###
 

@@ -1,4 +1,4 @@
-package rest
+package request
 
 type RegisterRequestBody struct {
 	Username string `json:"username"`

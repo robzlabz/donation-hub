@@ -1,0 +1,13 @@
+# .air.toml
+[build]
+cmd = "go build -o ./tmp/main ./cmd/main.go"
+bin = "tmp/main"
+full_bin = "./tmp/main"
+
+[watch]
+includes = ["cmd/", "internal/"]
+exclude_dir = ["assets", "tmp", "vendor"]
+exclude_file = [".env", ".air.toml"]
+
+[log]
+level = "debug"

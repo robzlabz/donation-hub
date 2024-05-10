@@ -3,19 +3,20 @@ package project
 import (
 	"context"
 	"errors"
+	"github.com/isdzulqor/donation-hub/internal/driven/storage/mysql/projectstr"
+	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"time"
 
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
-	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 )
 
 type Service interface {
-	RequestUploadURL(ctx context.Context, mime_type string, file_size int64) (err error)
-	SubmitProject(ctx context.Context, req rest.ProjectRequestBody) (err error)
-	ReviewProjectByAdmin(ctx context.Context, req rest.StatusUpdateRequestBody) (err error)
+	RequestUploadURL(ctx context.Context, mimeType string, fileSize int64) (err error)
+	SubmitProject(ctx context.Context, req request.ProjectRequestBody) (err error)
+	ReviewProjectByAdmin(ctx context.Context, req request.StatusUpdateRequestBody) (err error)
 	ListProject(ctx context.Context, limit int, page int, status string) (projects []entity.Project, err error)
 	GetProjectDetail(ctx context.Context, model *entity.Project) (err error)
-	DonateProject(ctx context.Context, req rest.DonationRequestBody) (err error)
+	DonateProject(ctx context.Context, req request.DonationRequestBody) (err error)
 	ListDonation(ctx context.Context, model entity.Project, limit int, page int) (donations []entity.Donation, err error)
 }
 
@@ -23,18 +24,18 @@ type service struct {
 	storage ProjectStorage
 }
 
-func NewService(storage ProjectStorage) Service {
+func NewService(storage *projectstr.Storage) Service {
 	return &service{
 		storage: storage,
 	}
 }
 
-func (s *service) RequestUploadURL(ctx context.Context, mime_type string, file_size int64) (err error) {
+func (s *service) RequestUploadURL(context.Context, string, int64) (err error) {
 	// todo: implement repository for get upload url
 	return
 }
 
-func (s *service) SubmitProject(ctx context.Context, req rest.ProjectRequestBody) (err error) {
+func (s *service) SubmitProject(ctx context.Context, req request.ProjectRequestBody) (err error) {
 	project := entity.Project{
 		Name:             req.Title,
 		Description:      req.Description,
@@ -56,7 +57,7 @@ func (s *service) SubmitProject(ctx context.Context, req rest.ProjectRequestBody
 	return
 }
 
-func (s *service) ReviewProjectByAdmin(ctx context.Context, req rest.StatusUpdateRequestBody) (err error) {
+func (s *service) ReviewProjectByAdmin(ctx context.Context, req request.StatusUpdateRequestBody) (err error) {
 	// todo: implement repository for review project
 	return
 }
@@ -83,7 +84,7 @@ func (s *service) GetProjectDetail(ctx context.Context, project *entity.Project)
 	return
 }
 
-func (s *service) DonateProject(ctx context.Context, req rest.DonationRequestBody) (err error) {
+func (s *service) DonateProject(ctx context.Context, req request.DonationRequestBody) (err error) {
 	donation := entity.Donation{
 		ProjectID: 1, // add project id,
 		DonorID:   1, // todo : get from jwt

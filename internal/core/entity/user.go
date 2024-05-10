@@ -1,18 +1,17 @@
 package entity
 
 import (
+	"github.com/isdzulqor/donation-hub/common/errors"
 	"strings"
-	"time"
-
-	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 )
 
 type User struct {
-	ID        int64
-	Username  string
-	Email     string
-	Password  string
-	CreatedAt time.Time
+	ID        int64    `db:"id" json:"id"`
+	Username  string   `db:"username" json:"username"`
+	Email     string   `db:"email" json:"email"`
+	Password  string   `db:"password" json:"password"`
+	CreatedAt int64    `db:"created_at" json:"created_at"`
+	Roles     []string `db:"roles" json:"roles"`
 }
 
 func (u User) Validate() (err error) {
@@ -31,25 +30,25 @@ func (u User) Validate() (err error) {
 
 func (u User) ValidateUsername() (err error) {
 	if u.Username == "" {
-		return rest.ErrUsernameIsRequired
+		return errors.ErrUsernameIsRequired
 	}
 	return nil
 }
 
 func (u User) ValidatePassword() (err error) {
 	if u.Password == "" {
-		return rest.ErrPasswordIsRequired
+		return errors.ErrPasswordIsRequired
 	}
 	return nil
 }
 
 func (u User) ValidateEmail() (err error) {
 	if u.Email == "" {
-		return rest.ErrEmailIsRequired
+		return errors.ErrEmailIsRequired
 	}
 	// split string by @ and ensure it has 2 parts for simple email validation
 	if len(strings.Split(u.Email, "@")) != 2 {
-		return rest.ErrInvalidEmail
+		return errors.ErrInvalidEmail
 	}
 	return nil
 }
