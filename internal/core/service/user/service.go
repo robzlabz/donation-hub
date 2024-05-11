@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"errors"
-	errors2 "github.com/isdzulqor/donation-hub/common/errors"
+	errors2 "github.com/isdzulqor/donation-hub/internal/common/errors"
 	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"time"
 
@@ -11,7 +11,7 @@ import (
 )
 
 type Service interface {
-	RegisterUser(ctx context.Context, req request.RegisterRequestBody) (err error)
+	RegisterUser(ctx context.Context, req request.RegisterRequestBody) (user entity.User, err error)
 	LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, err error)
 	GetListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error)
 }
@@ -26,8 +26,8 @@ func NewService(storage UserStorage) Service {
 	}
 }
 
-func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestBody) (err error) {
-	user := entity.User{
+func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestBody) (user entity.User, err error) {
+	user = entity.User{
 		Username: req.Username,
 		Password: req.Password,
 		Email:    req.Email,
@@ -40,12 +40,22 @@ func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestB
 	}
 
 	// check if user has already used
-	exist, err := s.storage.IsExist(ctx, user.Email)
+	existEmail, err := s.storage.IsExistEmail(ctx, user.Email)
 	if err != nil {
 		return
 	}
-	if exist {
-		err = errors.New("user already exist")
+	if existEmail {
+		err = errors.New("email already used")
+		return
+	}
+
+	existUsername, err := s.storage.IsExistUsername(ctx, user.Username)
+	if err != nil {
+		return
+	}
+
+	if existUsername {
+		err = errors.New("username already exist")
 		return
 	}
 
@@ -57,7 +67,7 @@ func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestB
 }
 
 func (s *service) LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, err error) {
-	exist, err := s.storage.IsExist(ctx, req.Email)
+	exist, err := s.storage.IsExistEmail(ctx, req.Email)
 	if err != nil {
 		return
 	}

@@ -8,12 +8,10 @@ import (
 	"github.com/isdzulqor/donation-hub/internal/core/service/project"
 	"github.com/isdzulqor/donation-hub/internal/core/service/user"
 	"github.com/isdzulqor/donation-hub/internal/driver/request"
-	"github.com/isdzulqor/donation-hub/internal/driver/response"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 type API struct {
@@ -22,21 +20,15 @@ type API struct {
 	ProjectService project.Service
 }
 
+var httpSuccess = HttpSuccess{}
+var httpError = HttpError{}
+
 func (a *API) HandlePing(w http.ResponseWriter, r *http.Request) {
-	// write json pong
-	w.Header().Set("Content-Type", "application/json")
 	type PingPong struct {
 		Ping string `json:"ping"`
 	}
 	pong := PingPong{Ping: "pong"}
-	res, err := json.Marshal(pong)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
+	httpSuccess.SuccessResponse(w, pong)
 }
 
 func (a *API) LogRequest(w http.ResponseWriter, r *http.Request) {
@@ -44,32 +36,22 @@ func (a *API) LogRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) HandlePostRegister(w http.ResponseWriter, r *http.Request) {
-	var req request.RegisterRequestBody
-	log.Printf("RequesTTT: %s %s", r.Method, r.URL.Path)
-	err := json.NewDecoder(r.Body).Decode(&req)
-	log.Printf("Request: %s", req)
-	if err != nil {
-		log.Println(err)
-		// todo : response error properly
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	if r.Method == http.MethodPost {
+		var req request.RegisterRequestBody
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			httpError.ErrBadRequest(w, err.Error())
+			return
+		}
+
+		registerUser, err := a.UserService.RegisterUser(r.Context(), req)
+		if err != nil {
+			httpError.ErrBadRequest(w, err.Error())
+			return
+		}
+
+		httpSuccess.SuccessResponse(w, registerUser)
 	}
-
-	// print request body
-	log.Println(req)
-
-	err = a.UserService.RegisterUser(r.Context(), req)
-	if err != nil {
-		log.Println(err)
-		// todo : response error properly
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	r.Header.Add("Content-Type", "application/json")
-	log.Printf("Response: %s", `{"ok":true}`)
-	w.Write([]byte(`{"ok":true}`))
 }
 
 func (a *API) HandlePostLogin(w http.ResponseWriter, r *http.Request) {
@@ -130,25 +112,9 @@ func (a *API) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a new ResponseListUser struct
-	resp := response.ResponseBodySuccess{
-		Ok:   true,
-		Data: users,
-		Ts:   time.Now().Unix(),
-	}
-
 	// Convert the response struct to JSON
-	jsonResponse, err := json.Marshal(resp)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// Write the JSON response
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+	httpSuccess := HttpSuccess{}
+	httpSuccess.SuccessResponse(w, users)
 }
 
 func (a *API) HandleGetProjects(w http.ResponseWriter, r *http.Request) {

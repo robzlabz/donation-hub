@@ -3,10 +3,8 @@ package userstr
 import (
 	"context"
 	"fmt"
-	"github.com/isdzulqor/donation-hub/internal/driver/request"
-	"strings"
-
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
+	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/validator.v2"
 )
@@ -51,34 +49,34 @@ func (s *Storage) ListUser(ctx context.Context, limit int, page int, role string
 	offset := (page - 1) * limit
 
 	// Prepare the SQL query
-	query := `SELECT users.id, users.username, users.email, users.password, users.created_at, GROUP_CONCAT(user_roles.role) AS roles
-        FROM users
-        JOIN user_roles ON users.id = user_roles.user_id
-        WHERE user_roles.role = ? GROUP BY users.id LIMIT ? OFFSET ? `
+	query := `SELECT users.*, GROUP_CONCAT(user_roles.role SEPARATOR ',') AS roles
+				FROM users 
+				JOIN user_roles ON users.id = user_roles.user_id
+				WHERE user_roles.role = ? GROUP BY users.id LIMIT ? OFFSET ? `
 
-	rows, err := s.sqlClient.QueryxContext(ctx, query, role, limit, offset)
+	// Execute the SQL query
+	err = s.sqlClient.SelectContext(ctx, &users, query, role, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("unable to execute query: %w", err)
-	}
-
-	for rows.Next() {
-		var user entity.User
-		var roles string
-		err = rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &roles)
-		if err != nil {
-			return nil, err
-		}
-		user.Roles = strings.Split(roles, ",")
-		users = append(users, user)
 	}
 
 	return users, nil
 }
 
-func (s *Storage) IsExist(ctx context.Context, email string) (exist bool, err error) {
+func (s *Storage) IsExistEmail(ctx context.Context, email string) (exist bool, err error) {
 	query := `SELECT COUNT(*) FROM users WHERE email = ?`
 	var count int
 	err = s.sqlClient.GetContext(ctx, &count, query, email)
+	if err != nil {
+		return
+	}
+	return count > 0, nil
+}
+
+func (s *Storage) IsExistUsername(ctx context.Context, username string) (exist bool, err error) {
+	query := `SELECT COUNT(*) FROM users WHERE username = ?`
+	var count int
+	err = s.sqlClient.GetContext(ctx, &count, query, username)
 	if err != nil {
 		return
 	}

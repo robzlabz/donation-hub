@@ -1,7 +1,7 @@
 package projectupload
 
 import (
-	"github.com/isdzulqor/donation-hub/common/errors"
+	"github.com/isdzulqor/donation-hub/internal/common/errors"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"

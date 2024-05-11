@@ -36,7 +36,7 @@ func main() {
 
 	mux.HandleFunc("/ping", restApi.HandlePing)
 
-	mux.HandleFunc("POST /users/register", restApi.HandlePostRegister)
+	mux.HandleFunc("/users/register", restApi.HandlePostRegister)
 	mux.HandleFunc("POST /users/login", restApi.HandlePostLogin)
 	mux.HandleFunc("/users", restApi.HandleGetUsers)
 	mux.HandleFunc("/projects", restApi.HandleGetProjects)

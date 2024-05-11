@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"github.com/isdzulqor/donation-hub/common/errors"
+	"github.com/isdzulqor/donation-hub/internal/common/errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

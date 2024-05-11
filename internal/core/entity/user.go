@@ -1,17 +1,17 @@
 package entity
 
 import (
-	"github.com/isdzulqor/donation-hub/common/errors"
+	"github.com/isdzulqor/donation-hub/internal/common/errors"
 	"strings"
 )
 
 type User struct {
-	ID        int64    `db:"id" json:"id"`
-	Username  string   `db:"username" json:"username"`
-	Email     string   `db:"email" json:"email"`
-	Password  string   `db:"password" json:"password"`
-	CreatedAt int64    `db:"created_at" json:"created_at"`
-	Roles     []string `db:"roles" json:"roles"`
+	ID        int64   `db:"id" json:"id"`
+	Username  string  `db:"username" json:"username"`
+	Email     string  `db:"email" json:"email"`
+	Password  string  `db:"password" json:"password"`
+	CreatedAt int64   `db:"created_at" json:"created_at"`
+	Roles     []uint8 `db:"roles" json:"roles"`
 }
 
 func (u User) Validate() (err error) {

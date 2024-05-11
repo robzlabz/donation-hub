@@ -551,7 +551,7 @@ GET /projects?status=approved&limit=10&start_ts=1704945600&end_ts=1704955600&las
                 }
             }
         ],
-        "last_key": "MTcxNDk2Mzg4MT38dsjndjnsdjs3"
+        "last_key": "MTcxNDk2M"
     },
     "ts": 1704954526
   }
