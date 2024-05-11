@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	errors2 "github.com/isdzulqor/donation-hub/internal/common/errors"
+	encryption "github.com/isdzulqor/donation-hub/internal/driven/encryption/jwt"
 	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"time"
 
@@ -17,12 +18,14 @@ type Service interface {
 }
 
 type service struct {
-	storage UserStorage
+	storage    UserStorage
+	encryption encryption.JWTService
 }
 
-func NewService(storage UserStorage) Service {
+func NewService(storage UserStorage, jwtService encryption.JWTService) Service {
 	return &service{
-		storage: storage,
+		storage:    storage,
+		encryption: jwtService,
 	}
 }
 
@@ -67,7 +70,7 @@ func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestB
 }
 
 func (s *service) LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, err error) {
-	exist, err := s.storage.IsExistEmail(ctx, req.Email)
+	exist, err := s.storage.IsExistUsername(ctx, req.Username)
 	if err != nil {
 		return
 	}
@@ -76,10 +79,17 @@ func (s *service) LoginUser(ctx context.Context, req request.LoginRequestBody) (
 		return
 	}
 
-	user, err = s.storage.LoginUser(ctx, req)
+	user = entity.User{
+		Username: req.Username,
+		Password: req.Password,
+	}
+
+	err = s.storage.LoginUser(ctx, &user)
 	if err != nil {
 		return
 	}
+
+	user.AccessToken, err = s.encryption.GenerateToken(user)
 
 	return user, nil
 }

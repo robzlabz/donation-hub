@@ -2,12 +2,12 @@ package encryption
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type JWTService interface {
-	GenerateToken(userID int64, role string) (string, error)
+	GenerateToken(user entity.User) (string, error)
 	ValidateToken(token string) (*jwt.Token, error)
 }
 
@@ -24,19 +24,17 @@ func NewJWTService(secretKey string, issuer string) JWTService {
 }
 
 type CustomClaims struct {
-	UserID int64  `json:"user_id"`
-	Role   string `json:"role"`
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
 	jwt.StandardClaims
 }
 
-func (s *jwtService) GenerateToken(userID int64, role string) (string, error) {
+func (s *jwtService) GenerateToken(user entity.User) (string, error) {
 	claims := &CustomClaims{
-		UserID: userID,
-		Role:   role,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
-			Issuer:    s.issuer,
-		},
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -53,11 +51,13 @@ func (s *jwtService) ValidateToken(token string) (*jwt.Token, error) {
 	})
 }
 
+// implement hash password if needed
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	return string(bytes), err
 }
 
+// implement check password hash if needed
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil

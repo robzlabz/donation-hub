@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/isdzulqor/donation-hub/internal/core/service/project"
 	"github.com/isdzulqor/donation-hub/internal/core/service/user"
+	encryption "github.com/isdzulqor/donation-hub/internal/driven/encryption/jwt"
 	"github.com/isdzulqor/donation-hub/internal/driven/storage/mysql/projectstr"
 	"github.com/isdzulqor/donation-hub/internal/driven/storage/mysql/userstr"
 	"github.com/jmoiron/sqlx"
@@ -21,7 +22,8 @@ func main() {
 	}
 
 	storageUser := userstr.New(userstr.Config{SQLClient: db})
-	userService := user.NewService(storageUser)
+	jwtDriven := encryption.NewJWTService("donation-hub", "donation-hub")
+	userService := user.NewService(storageUser, jwtDriven)
 
 	projectStorage := projectstr.New(projectstr.Config{SQLClient: db})
 	projectService := project.NewService(projectStorage)
@@ -37,7 +39,7 @@ func main() {
 	mux.HandleFunc("/ping", restApi.HandlePing)
 
 	mux.HandleFunc("/users/register", restApi.HandlePostRegister)
-	mux.HandleFunc("POST /users/login", restApi.HandlePostLogin)
+	mux.HandleFunc("/users/login", restApi.HandlePostLogin)
 	mux.HandleFunc("/users", restApi.HandleGetUsers)
 	mux.HandleFunc("/projects", restApi.HandleGetProjects)
 	mux.HandleFunc("POST /projects", restApi.HandlePostProjects)

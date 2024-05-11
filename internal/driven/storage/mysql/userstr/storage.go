@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
-	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/validator.v2"
 )
@@ -39,9 +38,16 @@ func (s *Storage) RegisterNewUser(ctx context.Context, user *entity.User) (err e
 	return nil
 }
 
-func (s *Storage) LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, err error) {
-	// implement your logic here
-	return entity.User{}, nil
+func (s *Storage) LoginUser(ctx context.Context, user *entity.User) (err error) {
+	// query user by username and password
+
+	query := `SELECT * FROM users WHERE username = ? AND password = ?`
+	err = s.sqlClient.GetContext(ctx, user, query, user.Username, user.Password)
+	if err != nil {
+		return fmt.Errorf("unable to execute query: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Storage) ListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error) {

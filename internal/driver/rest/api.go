@@ -55,35 +55,26 @@ func (a *API) HandlePostRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) HandlePostLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		// Parse the request body
+		var req request.LoginRequestBody
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			httpError.ErrBadRequest(w, err.Error())
+			return
+		}
 
-	// Parse the request body
-	var req request.LoginRequestBody
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		// Call the LoginUser method from the userService
+		user, err := a.UserService.LoginUser(r.Context(), req)
+		if err != nil {
+			httpError.ErrBadRequest(w, err.Error())
+			return
+		}
+
+		httpSuccess.SuccessResponse(w, user)
+	} else {
+		httpError.ErrNotFound(w)
 	}
-
-	// Call the LoginUser method from the userService
-	user, err := a.UserService.LoginUser(r.Context(), req)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// If login is successful, return a JSON response with the user details
-	res, err := json.Marshal(user)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
 }
 
 func (a *API) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
