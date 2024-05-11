@@ -19,6 +19,7 @@ require (
 	github.com/aws/aws-sdk-go v1.52.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/jmoiron/sqlx v1.4.0
+	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.9.0
 	gopkg.in/validator.v2 v2.0.1
 )
