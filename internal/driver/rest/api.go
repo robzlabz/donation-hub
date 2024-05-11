@@ -71,7 +71,20 @@ func (a *API) HandlePostLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		httpSuccess.SuccessResponse(w, user)
+		loginResponse := struct {
+			ID          int64  `json:"id"`
+			Email       string `json:"email"`
+			Username    string `json:"username"`
+			AccessToken string `json:"access_token"`
+			Ts          int64  `json:"ts"`
+		}{
+			ID:          user.ID,
+			Email:       user.Email,
+			Username:    user.Username,
+			AccessToken: user.AccessToken,
+		}
+
+		httpSuccess.SuccessResponse(w, loginResponse)
 	} else {
 		httpError.ErrNotFound(w)
 	}

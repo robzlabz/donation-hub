@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 type ResponseBodySuccess struct {
@@ -17,7 +18,7 @@ func (h *HttpSuccess) SuccessResponse(w http.ResponseWriter, data interface{}) {
 	resp := ResponseBodySuccess{
 		Ok:   true,
 		Data: data,
-		Ts:   0,
+		Ts:   time.Now().Unix(),
 	}
 
 	// Convert the response struct to JSON
