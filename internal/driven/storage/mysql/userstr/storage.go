@@ -39,8 +39,7 @@ func (s *Storage) RegisterNewUser(ctx context.Context, user *entity.User) (err e
 }
 
 func (s *Storage) LoginUser(ctx context.Context, user *entity.User) (err error) {
-	// query user by username and password
-
+	// note: this is not a good practice to store password in plain text but this is a requirement
 	query := `SELECT * FROM users WHERE username = ? AND password = ?`
 	err = s.sqlClient.GetContext(ctx, user, query, user.Username, user.Password)
 	if err != nil {

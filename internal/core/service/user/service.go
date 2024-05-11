@@ -13,7 +13,7 @@ import (
 
 type Service interface {
 	RegisterUser(ctx context.Context, req request.RegisterRequestBody) (user entity.User, err error)
-	LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, err error)
+	LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, accessToken string, err error)
 	GetListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error)
 }
 
@@ -69,7 +69,7 @@ func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestB
 	return
 }
 
-func (s *service) LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, err error) {
+func (s *service) LoginUser(ctx context.Context, req request.LoginRequestBody) (user entity.User, accessToken string, err error) {
 	exist, err := s.storage.IsExistUsername(ctx, req.Username)
 	if err != nil {
 		return
@@ -89,9 +89,9 @@ func (s *service) LoginUser(ctx context.Context, req request.LoginRequestBody) (
 		return
 	}
 
-	user.AccessToken, err = s.encryption.GenerateToken(user)
+	accessToken, err = s.encryption.GenerateToken(user)
 
-	return user, nil
+	return user, accessToken, nil
 }
 
 func (s *service) GetListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error) {

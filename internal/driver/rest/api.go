@@ -65,9 +65,9 @@ func (a *API) HandlePostLogin(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Call the LoginUser method from the userService
-		user, err := a.UserService.LoginUser(r.Context(), req)
+		loginUser, accessToken, err := a.UserService.LoginUser(r.Context(), req)
 		if err != nil {
-			httpError.ErrBadRequest(w, err.Error())
+			httpError.ErrUnauthorized(w, err.Error())
 			return
 		}
 
@@ -78,10 +78,10 @@ func (a *API) HandlePostLogin(w http.ResponseWriter, r *http.Request) {
 			AccessToken string `json:"access_token"`
 			Ts          int64  `json:"ts"`
 		}{
-			ID:          user.ID,
-			Email:       user.Email,
-			Username:    user.Username,
-			AccessToken: user.AccessToken,
+			ID:          loginUser.ID,
+			Email:       loginUser.Email,
+			Username:    loginUser.Username,
+			AccessToken: accessToken,
 		}
 
 		httpSuccess.SuccessResponse(w, loginResponse)

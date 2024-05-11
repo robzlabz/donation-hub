@@ -4,6 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type JWTService interface {
@@ -37,6 +38,8 @@ func (s *jwtService) GenerateToken(user entity.User) (string, error) {
 		Email:    user.Email,
 	}
 
+	// one year expiry time
+	claims.ExpiresAt = time.Now().Add(time.Hour * 24 * 365).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte(s.secretKey))
