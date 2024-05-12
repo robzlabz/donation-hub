@@ -61,13 +61,17 @@ func main() {
 	mux.HandleFunc("/ping", restApi.HandlePing)
 	mux.HandleFunc("/users/register", restApi.HandlePostRegister)
 	mux.HandleFunc("/users/login", restApi.HandlePostLogin)
-	mux.HandleFunc("/users", restApi.HandleGetUsers)
+	mux.HandleFunc("/projects/{id}", restApi.HandleProjectDetails)
+	mux.HandleFunc("/projects/{id}/donation", restApi.HandleGetProjectDonation)
+
+	// can be public or private
 	mux.HandleFunc("/projects", restApi.HandleGetProjects)
+
+	// Protected routes
+	mux.HandleFunc("/users", restApi.HandleGetUsers)
 	mux.HandleFunc("POST /projects", restApi.HandlePostProjects)
 	mux.HandleFunc("PUT /projects/{id}/review", restApi.HandleProjectReview)
-	mux.HandleFunc("/projects/{id}", restApi.HandleProjectDetails)
 	mux.HandleFunc("POST /projects/{id}/donation", restApi.HandlePostProjectDonation)
-	mux.HandleFunc("/projects/{id}/donation", restApi.HandleGetProjectDonation)
 
 	// Start the HTTP server
 	log.Fatal(http.ListenAndServe(":8180", mux))
