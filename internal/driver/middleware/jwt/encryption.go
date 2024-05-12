@@ -3,11 +3,21 @@
 package encryption
 
 import (
+	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
+	"strings"
 	"time"
 )
+
+type ResponseBodyError struct {
+	Ok  bool   `json:"ok"`
+	Err string `json:"err"`
+	Msg string `json:"msg"`
+	Ts  int64  `json:"ts"`
+}
 
 // JWTService is an interface that defines methods for generating and validating JWT tokens.
 type JWTService interface {
@@ -15,6 +25,8 @@ type JWTService interface {
 	GenerateToken(user entity.User) (string, error)
 	// ValidateToken validates a given JWT token and returns the parsed token if it's valid.
 	ValidateToken(token string) (*jwt.Token, error)
+
+	Middleware(next http.Handler, optional bool) http.Handler
 }
 
 // jwtService is a struct that implements the JWTService interface.
@@ -70,6 +82,63 @@ func (s *jwtService) ValidateToken(token string) (*jwt.Token, error) {
 	})
 }
 
+func (s *jwtService) ExtractClaims(tokenStr string) (CustomClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return []byte(s.secretKey), nil
+	})
+
+	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+		return *claims, nil
+	} else {
+		return CustomClaims{}, err
+	}
+}
+
+func (s *jwtService) Middleware(next http.Handler, canBeOptional bool) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+
+		// If the endpoint can be optional and there's no Authorization header, pass the request to the next handler
+		if canBeOptional && authHeader == "" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		// If the Authorization header does not contain "Bearer ", respond with an error
+		if !strings.Contains(authHeader, "Bearer ") {
+			responseError := ResponseBodyError{
+				Ok:  false,
+				Err: "ERR_INVALID_ACCESS_TOKEN",
+				Msg: "invalid access token",
+				Ts:  time.Now().Unix(),
+			}
+			JSONResponse(w, http.StatusUnauthorized, responseError)
+			return
+		}
+
+		tokenString := strings.Split(authHeader, " ")[1]
+		token, err := s.ValidateToken(tokenString)
+
+		// If there's an error in parsing the token or the token is not valid, respond with an error
+		if err != nil || !token.Valid {
+			responseError := ResponseBodyError{
+				Ok:  false,
+				Err: "ERR_INVALID_ACCESS_TOKEN",
+				Msg: "invalid access token",
+				Ts:  time.Now().Unix(),
+			}
+			JSONResponse(w, http.StatusUnauthorized, responseError)
+			return
+		}
+
+		// If the token is valid, pass the request to the next handler
+		next.ServeHTTP(w, r)
+	})
+}
+
 // HashPassword hashes a given password using bcrypt with 12 rounds of hashing.
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 12)
@@ -81,4 +150,16 @@ func HashPassword(password string) (string, error) {
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+func JSONResponse(w http.ResponseWriter, statusCode int, payload interface{}) {
+	response, err := json.Marshal(payload)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(response)
 }

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/isdzulqor/donation-hub/internal/core/service/project"
 	"github.com/isdzulqor/donation-hub/internal/core/service/user"
-	encryption "github.com/isdzulqor/donation-hub/internal/driven/encryption/jwt"
 	"github.com/isdzulqor/donation-hub/internal/driven/storage/mysql/projectstr"
 	"github.com/isdzulqor/donation-hub/internal/driven/storage/mysql/userstr"
+	"github.com/isdzulqor/donation-hub/internal/driver/middleware/jwt"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
@@ -40,8 +40,8 @@ func main() {
 
 	// Initialize the user storage and service
 	storageUser := userstr.New(userstr.Config{SQLClient: db})
-	jwtDriven := encryption.NewJWTService(jwtSecretKey, jwtIssuer)
-	userService := user.NewService(storageUser, jwtDriven)
+	jwtService := encryption.NewJWTService(jwtSecretKey, jwtIssuer)
+	userService := user.NewService(storageUser, jwtService)
 
 	// Initialize the project storage and service
 	projectStorage := projectstr.New(projectstr.Config{SQLClient: db})
@@ -62,16 +62,15 @@ func main() {
 	mux.HandleFunc("/users/register", restApi.HandlePostRegister)
 	mux.HandleFunc("/users/login", restApi.HandlePostLogin)
 	mux.HandleFunc("/projects/{id}", restApi.HandleProjectDetails)
-	mux.HandleFunc("/projects/{id}/donation", restApi.HandleGetProjectDonation)
 
 	// can be public or private
-	mux.HandleFunc("/projects", restApi.HandleGetProjects)
+	mux.Handle("/projects", jwtService.Middleware(http.HandlerFunc(restApi.HandleGetProjects), true))
 
 	// Protected routes
-	mux.HandleFunc("/users", restApi.HandleGetUsers)
-	mux.HandleFunc("POST /projects", restApi.HandlePostProjects)
-	mux.HandleFunc("PUT /projects/{id}/review", restApi.HandleProjectReview)
-	mux.HandleFunc("POST /projects/{id}/donation", restApi.HandlePostProjectDonation)
+	mux.Handle("/users", jwtService.Middleware(http.HandlerFunc(restApi.HandleGetUsers), false))
+	mux.Handle("POST /projects", jwtService.Middleware(http.HandlerFunc(restApi.HandlePostProjects), false))
+	mux.Handle("/projects/{id}/review", jwtService.Middleware(http.HandlerFunc(restApi.HandleProjectReview), false))
+	mux.Handle("/projects/{id}/donation", jwtService.Middleware(http.HandlerFunc(restApi.HandlePostProjectDonation), false))
 
 	// Start the HTTP server
 	log.Fatal(http.ListenAndServe(":8180", mux))

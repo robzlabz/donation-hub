@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	errors2 "github.com/isdzulqor/donation-hub/internal/common/errors"
-	encryption "github.com/isdzulqor/donation-hub/internal/driven/encryption/jwt"
+	"github.com/isdzulqor/donation-hub/internal/driver/middleware/jwt"
 	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"time"
 

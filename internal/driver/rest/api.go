@@ -132,7 +132,11 @@ func (a *API) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) HandleGetProjects(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Projects"))
+	httpSuccess.SuccessResponse(w, struct {
+		Message string `json:"message"`
+	}{
+		Message: "If you see this, you're authorized to access this route.",
+	})
 }
 
 func (a *API) HandlePostProjects(w http.ResponseWriter, r *http.Request) {
