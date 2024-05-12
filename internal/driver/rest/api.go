@@ -50,7 +50,17 @@ func (a *API) HandlePostRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		httpSuccess.SuccessResponse(w, registerUser)
+		responseRegister := struct {
+			ID       int64  `json:"id"`
+			Username string `json:"username"`
+			Email    string `json:"email"`
+		}{
+			ID:       registerUser.ID,
+			Username: registerUser.Username,
+			Email:    registerUser.Email,
+		}
+
+		httpSuccess.SuccessResponse(w, responseRegister)
 	}
 }
 

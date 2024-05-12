@@ -29,12 +29,20 @@ func New(cfg Config) *Storage {
 	return s
 }
 
-func (s *Storage) RegisterNewUser(ctx context.Context, user *entity.User) (err error) {
+func (s *Storage) RegisterNewUser(ctx context.Context, user *entity.User, role string) (err error) {
 	query := `INSERT INTO users (username, email, password, created_at) VALUES (:username, :email, :password, :created_at)`
 	_, err = s.sqlClient.NamedExecContext(ctx, query, user)
 	if err != nil {
 		return fmt.Errorf("unable to execute query due: %w", err)
 	}
+
+	// add role to user
+	query = `INSERT INTO user_roles (user_id, role) VALUES (:user_id, :role)`
+	_, err = s.sqlClient.NamedExecContext(ctx, query, map[string]interface{}{"user_id": user.ID, "role": role})
+	if err != nil {
+		return fmt.Errorf("unable to execute query due: %w", err)
+	}
+
 	return nil
 }
 

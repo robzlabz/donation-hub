@@ -64,7 +64,7 @@ func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestB
 
 	user.CreatedAt = time.Now().Unix()
 
-	err = s.storage.RegisterNewUser(ctx, &user)
+	err = s.storage.RegisterNewUser(ctx, &user, req.Role)
 
 	return
 }
