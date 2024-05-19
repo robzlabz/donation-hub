@@ -14,24 +14,17 @@ import (
 	"os"
 
 	"github.com/isdzulqor/donation-hub/internal/driver/rest"
-	"github.com/joho/godotenv"
 )
 
 // main is the main function of the application.
 // It sets up the database connection, initializes the services and starts the HTTP server.
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		panic(err)
-	}
-
-	// Database connection string
-	connectionString := getDatabaseConnectionString()
+	connectionString := os.Getenv("DATABASE_URL")
 
 	// Connect to the database
 	db, err := ConnectToDatabase(connectionString)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to connect to database: %v", err)
 	}
 
 	// Get JWT secret key and issuer from environment variables
@@ -73,7 +66,9 @@ func main() {
 	mux.Handle("/projects/{id}/donation", jwtService.Middleware(http.HandlerFunc(restApi.HandlePostProjectDonation), false))
 
 	// Start the HTTP server
+	log.Printf("server is running on port 8180")
 	log.Fatal(http.ListenAndServe(":8180", mux))
+
 }
 
 // ConnectToDatabase connects to the database using the provided connection string.
@@ -85,25 +80,4 @@ func ConnectToDatabase(connectionString string) (*sqlx.DB, error) {
 	}
 
 	return db, nil
-}
-
-// getDatabaseConnectionString constructs a database connection string using environment variables.
-// It retrieves the database username, password, host, port, and name from the environment variables
-// DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, and DB_NAME respectively.
-// It then formats these values into a connection string in the format "username:password@tcp(host:port)/dbname".
-// The function returns the constructed connection string.
-func getDatabaseConnectionString() string {
-	// Retrieve the database username from the environment variable DB_USERNAME
-	dbUsername := os.Getenv("DB_USERNAME")
-	// Retrieve the database password from the environment variable DB_PASSWORD
-	dbPassword := os.Getenv("DB_PASSWORD")
-	// Retrieve the database host from the environment variable DB_HOST
-	dbHost := os.Getenv("DB_HOST")
-	// Retrieve the database port from the environment variable DB_PORT
-	dbPort := os.Getenv("DB_PORT")
-	// Retrieve the database name from the environment variable DB_NAME
-	dbName := os.Getenv("DB_NAME")
-
-	// Format the retrieved values into a connection string and return it
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUsername, dbPassword, dbHost, dbPort, dbName)
 }

@@ -26,13 +26,14 @@ services:
       mysql:
         condition: service_healthy
     ports:
-      - 8180:8180
+      - "8180:8180"
     environment:
       - AWS_DEFAULT_REGION=ap-southeast-3
       - AWS_ACCESS_KEY_ID=awslocal
       - AWS_SECRET_ACCESS_KEY=awslocal
       - LOCALSTACK_ENDPOINT=http://localstack:4566
       - LOG_LEVEL=debug
+      - DATABASE_URL=root:test1234@tcp(mysql:3306)/donation_hub
 
   mysql:
     image: mysql:8.3.0
