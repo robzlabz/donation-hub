@@ -32,7 +32,10 @@ func main() {
 	jwtIssuer := os.Getenv("JWT_ISSUER")
 
 	// Initialize the user storage and service
-	storageUser := userstr.New(userstr.Config{SQLClient: db})
+	storageUser, err := userstr.New(userstr.Config{SQLClient: db})
+	if err != nil {
+		log.Fatalf("failed to initialize user storage: %v", err)
+	}
 	jwtService := encryption.NewJWTService(jwtSecretKey, jwtIssuer)
 	userService := user.NewService(storageUser, jwtService)
 

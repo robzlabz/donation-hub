@@ -2,10 +2,10 @@ package projectstr
 
 import (
 	"context"
+	"github.com/go-playground/validator/v10"
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"github.com/jmoiron/sqlx"
-	"gopkg.in/validator.v2"
 )
 
 type Storage struct {
@@ -18,11 +18,16 @@ func (s *Storage) IsProjectExist(ctx context.Context, id int) (exist bool, err e
 }
 
 type Config struct {
-	SQLClient *sqlx.DB `validate:"nonnil"`
+	SQLClient *sqlx.DB `validate:"required"`
 }
 
 func (c Config) Validate() error {
-	return validator.Validate(c)
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err := validate.Struct(c)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func New(cfg Config) *Storage {

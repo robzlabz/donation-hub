@@ -37,7 +37,7 @@ func (a *API) LogRequest(w http.ResponseWriter, r *http.Request) {
 
 func (a *API) HandlePostRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		var req request.RegisterRequestBody
+		var req user.InputRegister
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			httpError.ErrBadRequest(w, err.Error())
