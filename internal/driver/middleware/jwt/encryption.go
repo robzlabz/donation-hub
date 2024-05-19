@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strings"
 	"time"
@@ -137,19 +136,6 @@ func (s *jwtService) Middleware(next http.Handler, canBeOptional bool) http.Hand
 		// If the token is valid, pass the request to the next handler
 		next.ServeHTTP(w, r)
 	})
-}
-
-// HashPassword hashes a given password using bcrypt with 12 rounds of hashing.
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	return string(bytes), err
-}
-
-// CheckPasswordHash checks a given password against a hashed password.
-// It returns true if the password matches the hashed password, and false otherwise.
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }
 
 func JSONResponse(w http.ResponseWriter, statusCode int, payload interface{}) {
