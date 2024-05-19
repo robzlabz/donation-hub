@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	errors2 "github.com/isdzulqor/donation-hub/internal/common/errors"
-	encryption "github.com/isdzulqor/donation-hub/internal/driven/encryption/jwt"
+	"github.com/isdzulqor/donation-hub/internal/driver/middleware/jwt"
 	"github.com/isdzulqor/donation-hub/internal/driver/request"
 	"time"
 
@@ -64,7 +64,7 @@ func (s *service) RegisterUser(ctx context.Context, req request.RegisterRequestB
 
 	user.CreatedAt = time.Now().Unix()
 
-	err = s.storage.RegisterNewUser(ctx, &user)
+	err = s.storage.RegisterNewUser(ctx, &user, req.Role)
 
 	return
 }

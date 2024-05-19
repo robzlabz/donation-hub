@@ -50,7 +50,17 @@ func (a *API) HandlePostRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		httpSuccess.SuccessResponse(w, registerUser)
+		responseRegister := struct {
+			ID       int64  `json:"id"`
+			Username string `json:"username"`
+			Email    string `json:"email"`
+		}{
+			ID:       registerUser.ID,
+			Username: registerUser.Username,
+			Email:    registerUser.Email,
+		}
+
+		httpSuccess.SuccessResponse(w, responseRegister)
 	}
 }
 
@@ -122,7 +132,11 @@ func (a *API) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) HandleGetProjects(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Projects"))
+	httpSuccess.SuccessResponse(w, struct {
+		Message string `json:"message"`
+	}{
+		Message: "If you see this, you're authorized to access this route.",
+	})
 }
 
 func (a *API) HandlePostProjects(w http.ResponseWriter, r *http.Request) {
