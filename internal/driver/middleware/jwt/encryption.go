@@ -4,11 +4,12 @@ package encryption
 
 import (
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/isdzulqor/donation-hub/internal/core/entity"
 )
 
 type ResponseBodyError struct {

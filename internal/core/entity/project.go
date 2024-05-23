@@ -15,7 +15,7 @@ type Project struct {
 	CollectionAmount float64
 	Currency         string
 	Status           string
-	RequesterID      int
+	RequesterID      int64
 	DueAt            int64
 	CreatedAt        int64
 	UpdatedAt        int64

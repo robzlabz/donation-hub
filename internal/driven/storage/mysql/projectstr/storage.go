@@ -2,6 +2,7 @@ package projectstr
 
 import (
 	"context"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"github.com/isdzulqor/donation-hub/internal/driver/request"
@@ -44,7 +45,7 @@ func (s *Storage) RequestUploadURL(ctx context.Context) (err error) {
 	return nil
 }
 
-func (s *Storage) SubmitProject(ctx context.Context, project entity.Project) (err error) {
+func (s *Storage) SubmitProject(ctx context.Context, input *entity.Project) (err error) {
 	// implement your logic here
 	return nil
 }

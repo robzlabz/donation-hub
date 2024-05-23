@@ -142,7 +142,31 @@ func (a *API) HandleGetProjects(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) HandlePostProjects(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Projects"))
+	var req reqRegister
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		ErrBadRequest(w, err.Error())
+		return
+	}
+
+	// todo: handle disini
+	userID := int64(1) // todo: get from jwt
+
+	input := request.ProjectRequestBody{
+		Title:       req.Title,
+		Description: req.Description,
+		ImageURLs:   req.ImageUrls,
+		DueAt:       req.DueAt,
+		Currency:    req.Currency,
+	}
+
+	err = a.ProjectService.SubmitProject(r.Context(), input)
+	if err != nil {
+		ErrBadRequest(w, err.Error())
+		return
+	}
+
+	SuccessResponse(w, project)
 }
 
 func (a *API) HandleProjectReview(w http.ResponseWriter, r *http.Request) {

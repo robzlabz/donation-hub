@@ -20,6 +20,15 @@ type respSuccessLogin struct {
 	Ts          int64  `json:"ts"`
 }
 
+type reqRegister struct {
+	Title        string   `json:"title"`
+	Description  string   `json:"description"`
+	ImageUrls    []string `json:"image_urls"`
+	DueAt        int64    `json:"due_at"`
+	TargetAmount int64    `json:"target_amount"`
+	Currency     string   `json:"currency"`
+}
+
 type ResponseBodySuccess struct {
 	Ok   bool        `json:"ok"`
 	Data interface{} `json:"data"`
