@@ -144,11 +144,22 @@ func (a *API) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) HandleGetProjects(w http.ResponseWriter, r *http.Request) {
-	SuccessResponse(w, struct {
-		Message string `json:"message"`
-	}{
-		Message: "If you see this, you're authorized to access this route.",
-	})
+	// Get the page and limit values from the query parameters
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
+
+	// Default the page and limit to 1 and 10 respectively if they are not provided
+	var page, limit int
+	if pageStr == "" {
+		page = 1
+	} else {
+		page, _ = strconv.Atoi(pageStr) // error handling omitted for brevity
+	}
+	if limitStr == "" {
+		limit = 10
+	} else {
+		limit, _ = strconv.Atoi(limitStr) // error handling omitted for brevity
+	}
 }
 
 func (a *API) HandlePostProjects(w http.ResponseWriter, r *http.Request) {
