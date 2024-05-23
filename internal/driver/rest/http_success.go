@@ -6,15 +6,27 @@ import (
 	"time"
 )
 
+type respRegister struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+type respSuccessLogin struct {
+	ID          int64  `json:"id"`
+	Email       string `json:"email"`
+	Username    string `json:"username"`
+	AccessToken string `json:"access_token"`
+	Ts          int64  `json:"ts"`
+}
+
 type ResponseBodySuccess struct {
 	Ok   bool        `json:"ok"`
 	Data interface{} `json:"data"`
 	Ts   int64       `json:"ts"`
 }
 
-type HttpSuccess struct{}
-
-func (h *HttpSuccess) SuccessResponse(w http.ResponseWriter, data interface{}) {
+func SuccessResponse(w http.ResponseWriter, data interface{}) {
 	resp := ResponseBodySuccess{
 		Ok:   true,
 		Data: data,

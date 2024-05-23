@@ -13,9 +13,7 @@ type ResponseBodyError struct {
 	Ts  int64  `json:"ts"`
 }
 
-type HttpError struct{}
-
-func (h *HttpError) ErrBadRequest(w http.ResponseWriter, msg string) {
+func ErrBadRequest(w http.ResponseWriter, msg string) {
 	resp := ResponseBodyError{
 		Ok:  false,
 		Err: "ERR_BAD_REQUEST",
@@ -30,7 +28,7 @@ func (h *HttpError) ErrBadRequest(w http.ResponseWriter, msg string) {
 }
 
 // invalid access token
-func (h *HttpError) ErrUnauthorized(w http.ResponseWriter, msg string) {
+func ErrUnauthorized(w http.ResponseWriter, msg string) {
 	resp := ResponseBodyError{
 		Ok:  false,
 		Err: "ERR_INVALID_ACCESS_TOKEN",
@@ -45,7 +43,7 @@ func (h *HttpError) ErrUnauthorized(w http.ResponseWriter, msg string) {
 }
 
 // forbidden access
-func (h *HttpError) ErrForbidden(w http.ResponseWriter) {
+func ErrForbidden(w http.ResponseWriter) {
 	resp := ResponseBodyError{
 		Ok:  false,
 		Err: "ERR_FORBIDDEN",
@@ -60,7 +58,7 @@ func (h *HttpError) ErrForbidden(w http.ResponseWriter) {
 }
 
 // not found
-func (h *HttpError) ErrNotFound(w http.ResponseWriter) {
+func ErrNotFound(w http.ResponseWriter) {
 	resp := ResponseBodyError{
 		Ok:  false,
 		Err: "ERR_NOT_FOUND",
@@ -75,7 +73,7 @@ func (h *HttpError) ErrNotFound(w http.ResponseWriter) {
 }
 
 // internal error
-func (h *HttpError) ErrInternalServer(w http.ResponseWriter, msg string) {
+func ErrInternalServer(w http.ResponseWriter, msg string) {
 	resp := ResponseBodyError{
 		Ok:  false,
 		Err: "ERR_INTERNAL_SERVER",
