@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
@@ -114,22 +113,7 @@ func (a *API) HandlePostLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
-	// Get the page and limit values from the query parameters
-	pageStr := r.URL.Query().Get("page")
-	limitStr := r.URL.Query().Get("limit")
-
-	// Default the page and limit to 1 and 10 respectively if they are not provided
-	var page, limit int
-	if pageStr == "" {
-		page = 1
-	} else {
-		page, _ = strconv.Atoi(pageStr) // error handling omitted for brevity
-	}
-	if limitStr == "" {
-		limit = 10
-	} else {
-		limit, _ = strconv.Atoi(limitStr) // error handling omitted for brevity
-	}
+	page, limit := GetPageLimit(r)
 
 	users, err := a.UserService.GetListUser(r.Context(), limit, page, entity.UserRoleDonor)
 	fmt.Println(users)
@@ -144,22 +128,17 @@ func (a *API) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) HandleGetProjects(w http.ResponseWriter, r *http.Request) {
-	// Get the page and limit values from the query parameters
-	pageStr := r.URL.Query().Get("page")
-	limitStr := r.URL.Query().Get("limit")
+	page, limit := GetPageLimit(r)
 
-	// Default the page and limit to 1 and 10 respectively if they are not provided
-	var page, limit int
-	if pageStr == "" {
-		page = 1
-	} else {
-		page, _ = strconv.Atoi(pageStr) // error handling omitted for brevity
+	status := r.URL.Query().Get("status")
+
+	projects, err := a.ProjectService.ListProject(r.Context(), limit, page, status)
+	if err != nil {
+		ErrBadRequest(w, err.Error())
+		return
 	}
-	if limitStr == "" {
-		limit = 10
-	} else {
-		limit, _ = strconv.Atoi(limitStr) // error handling omitted for brevity
-	}
+
+	SuccessResponse(w, projects)
 }
 
 func (a *API) HandlePostProjects(w http.ResponseWriter, r *http.Request) {

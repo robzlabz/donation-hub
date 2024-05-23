@@ -15,3 +15,20 @@ func parseBearerToken(r *http.Request) string {
 	}
 	return token[1]
 }
+
+func GetPageLimit(r *http.Request) (page, limit int) {
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
+
+	if pageStr == "" {
+		page = 1
+	} else {
+		page = 1
+	}
+	if limitStr == "" {
+		limit = 10
+	} else {
+		limit = 10
+	}
+	return
+}
