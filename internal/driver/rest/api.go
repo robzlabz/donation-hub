@@ -22,7 +22,7 @@ type ApiConfig struct {
 }
 
 type API struct {
-	config         ApiConfig
+	Config         ApiConfig
 	NetHttp        *http.Server
 	UserService    user.Service
 	ProjectService project.Service
@@ -35,7 +35,7 @@ func NewAPI(config ApiConfig) (*API, error) {
 	}
 
 	app := &API{
-		config:         config,
+		Config:         config,
 		UserService:    config.UserService,
 		ProjectService: config.ProjectService,
 	}
@@ -54,6 +54,15 @@ func NewAPI(config ApiConfig) (*API, error) {
 	app.NetHttp = &http.Server{}
 
 	return app, nil
+}
+
+func (a *API) Start() error {
+	err := a.NetHttp.ListenAndServe()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (a *API) HandlePing(w http.ResponseWriter, r *http.Request) {
@@ -149,24 +158,25 @@ func (a *API) HandlePostProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// todo: handle disini
-	userID := int64(1) // todo: get from jwt
-
-	input := request.ProjectRequestBody{
-		Title:       req.Title,
-		Description: req.Description,
-		ImageURLs:   req.ImageUrls,
-		DueAt:       req.DueAt,
-		Currency:    req.Currency,
-	}
-
-	err = a.ProjectService.SubmitProject(r.Context(), input)
-	if err != nil {
-		ErrBadRequest(w, err.Error())
-		return
-	}
-
-	SuccessResponse(w, project)
+	//
+	//// todo: handle disini
+	//userID := int64(1) // todo: get from jwt
+	//
+	//input := request.ProjectRequestBody{
+	//	Title:       req.Title,
+	//	Description: req.Description,
+	//	ImageURLs:   req.ImageUrls,
+	//	DueAt:       req.DueAt,
+	//	Currency:    req.Currency,
+	//}
+	//
+	//err = a.ProjectService.SubmitProject(r.Context(), input)
+	//if err != nil {
+	//	ErrBadRequest(w, err.Error())
+	//	return
+	//}
+	//
+	//SuccessResponse(w, project)
 }
 
 func (a *API) HandleProjectReview(w http.ResponseWriter, r *http.Request) {

@@ -3,9 +3,6 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-
 	"github.com/gosidekick/goconfig"
 	"github.com/isdzulqor/donation-hub/internal/core/service/project"
 	"github.com/isdzulqor/donation-hub/internal/core/service/user"
@@ -14,6 +11,7 @@ import (
 	encryption "github.com/isdzulqor/donation-hub/internal/driver/middleware/jwt"
 	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 	"github.com/jmoiron/sqlx"
+	"log"
 )
 
 type Config struct {
@@ -53,33 +51,20 @@ func main() {
 	projectService := project.NewService(projectStorage)
 
 	// Initialize the REST API
-	var restApi = rest.API{
+	app, err := rest.NewAPI(rest.ApiConfig{
 		DB:             db,
 		UserService:    userService,
 		ProjectService: projectService,
+	})
+
+	if err != nil {
+		log.Fatalf("failed to start app %v", err)
 	}
 
-	// Set up the HTTP server
-	mux := http.NewServeMux()
-
-	// Define the HTTP routes
-	mux.HandleFunc("/ping", restApi.HandlePing)
-	mux.HandleFunc("/users/register", restApi.HandlePostRegister)
-	mux.HandleFunc("/users/login", restApi.HandlePostLogin)
-	mux.HandleFunc("/projects/{id}", restApi.HandleProjectDetails)
-
-	// can be public or private
-	mux.Handle("/projects", jwtService.Middleware(http.HandlerFunc(restApi.HandleGetProjects), true))
-
-	// Protected routes
-	mux.Handle("/users", jwtService.Middleware(http.HandlerFunc(restApi.HandleGetUsers), false))
-	mux.Handle("POST /projects", jwtService.Middleware(http.HandlerFunc(restApi.HandlePostProjects), false))
-	mux.Handle("/projects/{id}/review", jwtService.Middleware(http.HandlerFunc(restApi.HandleProjectReview), false))
-	mux.Handle("/projects/{id}/donation", jwtService.Middleware(http.HandlerFunc(restApi.HandlePostProjectDonation), false))
-
-	// Start the HTTP server
-	log.Printf("server is running on port 8180")
-	log.Fatal(http.ListenAndServe(":8180", mux))
+	err = app.Start()
+	if err != nil {
+		log.Fatalf("failed to start app %v", err)
+	}
 
 }
 
