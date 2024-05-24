@@ -3,6 +3,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/gosidekick/goconfig"
 	"github.com/isdzulqor/donation-hub/internal/core/service/project"
 	"github.com/isdzulqor/donation-hub/internal/core/service/user"
@@ -11,7 +13,6 @@ import (
 	encryption "github.com/isdzulqor/donation-hub/internal/driver/middleware/jwt"
 	"github.com/isdzulqor/donation-hub/internal/driver/rest"
 	"github.com/jmoiron/sqlx"
-	"log"
 )
 
 type Config struct {
@@ -19,7 +20,7 @@ type Config struct {
 	TokenSecret                   string `cfg:"token_secret" required:"true"`
 	AccessTokenDurationInSeconds  int    `cfg:"access_token_duration_in_seconds" required:"true"`
 	RefreshTokenDurationInSeconds int    `cfg:"refresh_token_duration_in_seconds" required:"true"`
-	SqlDsn                        string `cfg:"sql_dsn" required:"true"`
+	SqlDsn                        string `cfg:"sql_dsn" required:"true" cfgDefault:"root@tcp(127.0.0.1)/donation_hub"`
 	PhotoBucketName               string `cfg:"photo_bucket_name" required:"true"`
 	Port                          int    `cfg:"port" required:"true"`
 }
@@ -32,6 +33,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to parse config: %v", err)
 	}
+
+	fmt.Println(cfg)
 	// Connect to the database
 	db, err := ConnectToDatabase(cfg.SqlDsn)
 	if err != nil {
@@ -51,7 +54,7 @@ func main() {
 	projectService := project.NewService(projectStorage)
 
 	// Initialize the REST API
-	app, err := rest.NewAPI(rest.ApiConfig{
+	_, err = rest.NewAPI(rest.ApiConfig{
 		DB:             db,
 		UserService:    userService,
 		ProjectService: projectService,
@@ -60,12 +63,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to start app %v", err)
 	}
-
-	err = app.Start()
-	if err != nil {
-		log.Fatalf("failed to start app %v", err)
-	}
-
 }
 
 // ConnectToDatabase connects to the database using the provided connection string.

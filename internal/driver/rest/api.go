@@ -23,7 +23,7 @@ type ApiConfig struct {
 
 type API struct {
 	Config         ApiConfig
-	NetHttp        *http.Server
+	Router         *http.ServeMux
 	UserService    user.Service
 	ProjectService project.Service
 }
@@ -41,9 +41,10 @@ func NewAPI(config ApiConfig) (*API, error) {
 	}
 
 	// make http handler with net/http
+	http.HandleFunc("/", app.LogRequest)
 	http.HandleFunc("GET /ping", app.HandlePing)
-	http.HandleFunc("POST /register", app.HandlePostRegister)
-	http.HandleFunc("POST /login", app.HandlePostLogin)
+	http.HandleFunc("POST /users/register", app.HandlePostRegister)
+	http.HandleFunc("/users/login", app.HandlePostLogin)
 	http.HandleFunc("GET /users", app.HandleGetUsers)
 	http.HandleFunc("GET /projects", app.HandleGetProjects)
 	http.HandleFunc("POST /projects", app.HandlePostProjects)
@@ -51,18 +52,12 @@ func NewAPI(config ApiConfig) (*API, error) {
 	http.HandleFunc("GET /projects/{id}", app.HandleProjectDetails)
 	http.HandleFunc("GET /projects/{id}/donate", app.HandlePostProjectDonation)
 
-	app.NetHttp = &http.Server{}
-
-	return app, nil
-}
-
-func (a *API) Start() error {
-	err := a.NetHttp.ListenAndServe()
-	if err != nil {
-		return err
+	fmt.Println("Server is running on port 8180")
+	if err := http.ListenAndServe(":8180", nil); err != nil {
+		return nil, fmt.Errorf("failed to start server: %w", err)
 	}
 
-	return nil
+	return app, nil
 }
 
 func (a *API) HandlePing(w http.ResponseWriter, r *http.Request) {
@@ -75,6 +70,8 @@ func (a *API) HandlePing(w http.ResponseWriter, r *http.Request) {
 
 func (a *API) LogRequest(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Request: %s %s", r.Method, r.URL.Path)
+	// write it's working
+	w.Write([]byte("It's working"))
 }
 
 func (a *API) HandlePostRegister(w http.ResponseWriter, r *http.Request) {
