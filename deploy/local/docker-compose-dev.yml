@@ -1,0 +1,50 @@
+version: "2.4"
+services:
+  localstack:
+    image: localstack/localstack:3.2.0
+    healthcheck:
+      test: >-
+        curl -s localhost:4566/_localstack/init 2>&1 | grep -o '"001_init-localstack.sh", "state": "SUCCESSFUL"' > /dev/null
+      start_period: 30s
+    ports:
+      - 4566:4566
+      - 4510-4559:4510-4559
+    environment:
+      - SERVICES=s3
+      - DISABLE_CORS_CHECKS=1
+      - LS_LOG=warn
+    volumes:
+      - ./001_init-localstack.sh:/etc/localstack/init/ready.d/001_init-localstack.sh
+
+  server:
+    build:
+      context: ../../
+      dockerfile: ./build/package/Dockerfile.local
+    volumes:
+      - ../../:/app
+      - ../../.aircache:/app/.aircache
+    depends_on:
+      localstack:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8180:8180"
+    environment:
+      - AWS_DEFAULT_REGION=ap-southeast-3
+      - AWS_ACCESS_KEY_ID=awslocal
+      - AWS_SECRET_ACCESS_KEY=awslocal
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - LOG_LEVEL=debug
+      - DATABASE_URL=root:test1234@tcp(mysql:3306)/donation_hub
+
+  mysql:
+    image: mysql:8.3.0
+    ports:
+      - 3314:3306
+    healthcheck:
+      test: mysqladmin ping -h localhost
+    environment:
+      - MYSQL_ROOT_PASSWORD=test1234
+    volumes:
+      - ../../docs/db:/docker-entrypoint-initdb.d

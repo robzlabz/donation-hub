@@ -20,7 +20,7 @@ type Config struct {
 	TokenSecret                   string `cfg:"token_secret" required:"true"`
 	AccessTokenDurationInSeconds  int    `cfg:"access_token_duration_in_seconds" required:"true"`
 	RefreshTokenDurationInSeconds int    `cfg:"refresh_token_duration_in_seconds" required:"true"`
-	SqlDsn                        string `cfg:"sql_dsn" required:"true" cfgDefault:"root@tcp(127.0.0.1)/donation_hub"`
+	DatabaseUrl                   string `cfg:"database_url" required:"true" cfgDefault:"root@tcp(127.0.0.1)/donation_hub"`
 	PhotoBucketName               string `cfg:"photo_bucket_name" required:"true"`
 	Port                          int    `cfg:"port" required:"true"`
 }
@@ -36,7 +36,7 @@ func main() {
 
 	fmt.Println(cfg)
 	// Connect to the database
-	db, err := ConnectToDatabase(cfg.SqlDsn)
+	db, err := ConnectToDatabase(cfg.DatabaseUrl)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
