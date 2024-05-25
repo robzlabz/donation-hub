@@ -1,54 +1,72 @@
+// Package main is the entry point of the application.
 package main
 
 import (
 	"fmt"
+	"log"
+
+	"github.com/gosidekick/goconfig"
 	"github.com/isdzulqor/donation-hub/internal/core/service/project"
 	"github.com/isdzulqor/donation-hub/internal/core/service/user"
 	"github.com/isdzulqor/donation-hub/internal/driven/storage/mysql/projectstr"
 	"github.com/isdzulqor/donation-hub/internal/driven/storage/mysql/userstr"
-	"github.com/jmoiron/sqlx"
-	"log"
-	"net/http"
-
+	encryption "github.com/isdzulqor/donation-hub/internal/driver/middleware/jwt"
 	"github.com/isdzulqor/donation-hub/internal/driver/rest"
+	"github.com/jmoiron/sqlx"
 )
 
+type Config struct {
+	TokenIssuer                   string `cfg:"token_issuer" required:"true"`
+	TokenSecret                   string `cfg:"token_secret" required:"true"`
+	AccessTokenDurationInSeconds  int    `cfg:"access_token_duration_in_seconds" required:"true"`
+	RefreshTokenDurationInSeconds int    `cfg:"refresh_token_duration_in_seconds" required:"true"`
+	DatabaseUrl                   string `cfg:"database_url" required:"true" cfgDefault:"root@tcp(127.0.0.1)/donation_hub"`
+	PhotoBucketName               string `cfg:"photo_bucket_name" required:"true"`
+	Port                          int    `cfg:"port" required:"true"`
+}
+
+// main is the main function of the application.
+// It sets up the database connection, initializes the services and starts the HTTP server.
 func main() {
-	connectionString := "root:@tcp(localhost:3306)/donation_hub"
-	db, err := ConnectToDatabase(connectionString)
+	cfg := Config{}
+	err := goconfig.Parse(&cfg)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("failed to parse config: %v", err)
 	}
 
-	storageUser := userstr.New(userstr.Config{SQLClient: db})
-	userService := user.NewService(storageUser)
+	// Connect to the database
+	db, err := ConnectToDatabase(cfg.DatabaseUrl)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
 
+	// Initialize the user storage and service
+	storageUser, err := userstr.New(userstr.Config{SQLClient: db})
+	if err != nil {
+		log.Fatalf("failed to initialize user storage: %v", err)
+	}
+	jwtService := encryption.NewJWTService(cfg.TokenSecret, cfg.TokenIssuer)
+	userService := user.NewService(storageUser, jwtService)
+
+	// Initialize the project storage and service
 	projectStorage := projectstr.New(projectstr.Config{SQLClient: db})
 	projectService := project.NewService(projectStorage)
 
-	var restApi = rest.API{
+	// Initialize the REST API
+	_, err = rest.NewAPI(rest.ApiConfig{
 		DB:             db,
 		UserService:    userService,
 		ProjectService: projectService,
+		JWTSecret:      cfg.TokenSecret,
+	})
+
+	if err != nil {
+		log.Fatalf("failed to start app %v", err)
 	}
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/ping", restApi.HandlePing)
-
-	mux.HandleFunc("/users/register", restApi.HandlePostRegister)
-	mux.HandleFunc("POST /users/login", restApi.HandlePostLogin)
-	mux.HandleFunc("/users", restApi.HandleGetUsers)
-	mux.HandleFunc("/projects", restApi.HandleGetProjects)
-	mux.HandleFunc("POST /projects", restApi.HandlePostProjects)
-	mux.HandleFunc("PUT /projects/{id}/review", restApi.HandleProjectReview)
-	mux.HandleFunc("/projects/{id}", restApi.HandleProjectDetails)
-	mux.HandleFunc("POST /projects/{id}/donation", restApi.HandlePostProjectDonation)
-	mux.HandleFunc("/projects/{id}/donation", restApi.HandleGetProjectDonation)
-
-	log.Fatal(http.ListenAndServe(":8180", mux))
 }
 
+// ConnectToDatabase connects to the database using the provided connection string.
+// It returns a sqlx.DB object and an error.
 func ConnectToDatabase(connectionString string) (*sqlx.DB, error) {
 	db, err := sqlx.Connect("mysql", connectionString)
 	if err != nil {

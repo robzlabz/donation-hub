@@ -1,0 +1,7 @@
+FROM golang:1.22.3-alpine3.19
+WORKDIR /app
+
+RUN go install github.com/cosmtrek/air@v1.51.0
+RUN mkdir -p .aircache
+
+ENTRYPOINT [ "air", "-c", "./build/package/.air.toml" ]

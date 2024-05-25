@@ -3,7 +3,30 @@ package rest
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 )
+
+type respRegister struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+type respSuccessLogin struct {
+	ID          int64  `json:"id"`
+	Email       string `json:"email"`
+	Username    string `json:"username"`
+	AccessToken string `json:"access_token"`
+}
+
+type reqRegister struct {
+	Title        string   `json:"title"`
+	Description  string   `json:"description"`
+	ImageUrls    []string `json:"image_urls"`
+	DueAt        int64    `json:"due_at"`
+	TargetAmount int64    `json:"target_amount"`
+	Currency     string   `json:"currency"`
+}
 
 type ResponseBodySuccess struct {
 	Ok   bool        `json:"ok"`
@@ -11,13 +34,11 @@ type ResponseBodySuccess struct {
 	Ts   int64       `json:"ts"`
 }
 
-type HttpSuccess struct{}
-
-func (h *HttpSuccess) SuccessResponse(w http.ResponseWriter, data interface{}) {
+func SuccessResponse(w http.ResponseWriter, data interface{}) {
 	resp := ResponseBodySuccess{
 		Ok:   true,
 		Data: data,
-		Ts:   0,
+		Ts:   time.Now().Unix(),
 	}
 
 	// Convert the response struct to JSON
