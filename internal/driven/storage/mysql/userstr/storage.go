@@ -7,6 +7,7 @@ import (
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"github.com/isdzulqor/donation-hub/internal/core/service/user"
 	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 type Storage struct {
@@ -37,8 +38,8 @@ func New(cfg Config) (*Storage, error) {
 
 func (s *Storage) RegisterNewUser(ctx context.Context, input user.InputRegister) (int64, error) {
 	// insert user data
-	query := `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`
-	res, err := s.sqlClient.ExecContext(ctx, query, input.Username, input.Email, input.Password)
+	query := `INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)`
+	res, err := s.sqlClient.ExecContext(ctx, query, input.Username, input.Email, input.Password, time.Now().Unix())
 	if err != nil {
 		return 0, fmt.Errorf("unable to execute query: %w", err)
 	}

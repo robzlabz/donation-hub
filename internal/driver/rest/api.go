@@ -43,7 +43,7 @@ func NewAPI(config ApiConfig) (*API, error) {
 	// make http handler with net/http
 	http.HandleFunc("/", app.LogRequest)
 	http.HandleFunc("GET /ping", app.HandlePing)
-	http.HandleFunc("POST /users/register", app.HandlePostRegister)
+	http.HandleFunc("/users/register", app.HandlePostRegister)
 	http.HandleFunc("/users/login", app.HandlePostLogin)
 	http.HandleFunc("GET /users", app.HandleGetUsers)
 	http.HandleFunc("GET /projects", app.HandleGetProjects)
