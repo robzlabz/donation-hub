@@ -67,7 +67,6 @@ func (s *Storage) LoginUser(ctx context.Context, user *entity.User) (err error) 
 	if err != nil {
 		return fmt.Errorf("unable to execute query: %w", err)
 	}
-
 	return nil
 }
 

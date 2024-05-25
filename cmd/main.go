@@ -34,7 +34,6 @@ func main() {
 		log.Fatalf("failed to parse config: %v", err)
 	}
 
-	fmt.Println(cfg)
 	// Connect to the database
 	db, err := ConnectToDatabase(cfg.DatabaseUrl)
 	if err != nil {
@@ -58,6 +57,7 @@ func main() {
 		DB:             db,
 		UserService:    userService,
 		ProjectService: projectService,
+		JWTSecret:      cfg.TokenSecret,
 	})
 
 	if err != nil {

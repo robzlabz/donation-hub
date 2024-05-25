@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/isdzulqor/donation-hub/internal/driven/storage/mysql/projectstr"
@@ -74,7 +75,13 @@ func (s *service) ReviewProjectByAdmin(ctx context.Context, req request.StatusUp
 }
 
 func (s *service) ListProject(ctx context.Context, limit int, page int, status string) (projects []entity.Project, err error) {
-	return s.storage.ListProject(ctx, limit, page, status)
+	fmt.Println("ListProject Service")
+	project, err := s.storage.GetProjects(ctx, limit, page, status)
+	if err != nil {
+		return nil, err
+	}
+
+	return project, nil
 }
 
 func (s *service) GetProjectDetail(ctx context.Context, project *entity.Project) (err error) {

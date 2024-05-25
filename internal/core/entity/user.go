@@ -10,12 +10,12 @@ import (
 // It includes fields for the user's ID, username, email, password, creation time, and roles.
 // The struct fields have db and json tags for database and JSON marshaling/unmarshaling respectively.
 type User struct {
-	ID        int64    `json:"id"`
-	Username  string   `json:"username"`
-	Email     string   `json:"email"`
-	Password  string   `json:"password"`
-	CreatedAt int64    `json:"created_at"`
-	Roles     []string `json:"roles"`
+	ID        int64    `json:"id" db:"id"`
+	Username  string   `json:"username" db:"username"`
+	Email     string   `json:"email" db:"email"`
+	Password  string   `json:"password" db:"password"`
+	CreatedAt int64    `json:"created_at" db:"created_at"`
+	Roles     []string `json:"roles" db:"roles"`
 }
 
 // Validate is a method of User that validates the user's username, password, and email.
