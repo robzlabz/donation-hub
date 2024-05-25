@@ -7,6 +7,7 @@ import (
 	"github.com/isdzulqor/donation-hub/internal/core/entity"
 	"github.com/isdzulqor/donation-hub/internal/core/service/user"
 	"github.com/jmoiron/sqlx"
+	"strings"
 	"time"
 )
 
@@ -70,6 +71,15 @@ func (s *Storage) LoginUser(ctx context.Context, user *entity.User) (err error) 
 	return nil
 }
 
+type DBUser struct {
+	ID        int64  `db:"id"`
+	Username  string `db:"username"`
+	Email     string `db:"email"`
+	Password  string `db:"password"`
+	CreatedAt int64  `db:"created_at"`
+	Roles     string `db:"roles"`
+}
+
 func (s *Storage) ListUser(ctx context.Context, limit int, page int, role string) (users []entity.User, err error) {
 	// Calculate the offset for the SQL query
 	offset := (page - 1) * limit
@@ -80,10 +90,24 @@ func (s *Storage) ListUser(ctx context.Context, limit int, page int, role string
 				JOIN user_roles ON users.id = user_roles.user_id
 				WHERE user_roles.role = ? GROUP BY users.id LIMIT ? OFFSET ? `
 
+	dbuser := []DBUser{}
+
 	// Execute the SQL query
-	err = s.sqlClient.SelectContext(ctx, &users, query, role, limit, offset)
+	err = s.sqlClient.SelectContext(ctx, &dbuser, query, role, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("unable to execute query: %w", err)
+	}
+
+	// Convert the DBUser struct to the entity.User struct
+	for _, u := range dbuser {
+		users = append(users, entity.User{
+			ID:        u.ID,
+			Username:  u.Username,
+			Email:     u.Email,
+			Password:  u.Password,
+			CreatedAt: u.CreatedAt,
+			Roles:     strings.Split(u.Roles, ","),
+		})
 	}
 
 	return users, nil

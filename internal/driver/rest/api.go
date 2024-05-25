@@ -45,7 +45,7 @@ func NewAPI(config ApiConfig) (*API, error) {
 	http.HandleFunc("GET /ping", app.HandlePing)
 	http.HandleFunc("/users/register", app.HandlePostRegister)
 	http.HandleFunc("/users/login", app.HandlePostLogin)
-	http.HandleFunc("GET /users", app.HandleGetUsers)
+	http.HandleFunc("/users", app.HandleGetUsers)
 	http.HandleFunc("GET /projects", app.HandleGetProjects)
 	http.HandleFunc("POST /projects", app.HandlePostProjects)
 	http.HandleFunc("POST /projects/{id}/review", app.HandleProjectReview)
