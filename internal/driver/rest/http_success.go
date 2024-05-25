@@ -17,7 +17,6 @@ type respSuccessLogin struct {
 	Email       string `json:"email"`
 	Username    string `json:"username"`
 	AccessToken string `json:"access_token"`
-	Ts          int64  `json:"ts"`
 }
 
 type reqRegister struct {
